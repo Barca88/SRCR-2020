@@ -24,7 +24,6 @@
 :- dynamic adjudicante/4.
 :- dynamic adjudicataria/4.
 :- dynamic contrato/10.
-%:- dynamic data/4.
 :- dynamic '-'/1.
 :- dynamic excecao/1.
 :- dynamic clausImperfeito/2.
@@ -210,8 +209,15 @@ nao( Questao ).
 %Extensão do predicado adjudicante: #IdA, Nome, Nif, Morada -> {V,F,D}
 
 adjudicante(1, cmb, 123456789, braga).
-%(...)
-%FAZER EXATAMENTE 15 EXEMPLOS
+adjudicante(2, cmvm, 325824562, vieira_minho).
+adjudicante(3, cmvl, 858617833, vila_real).
+adjudicante(4, cmpv, 389646360, povoa_varzim).
+adjudicante(5, cmpl, 809032071, povoa_lanhoso).
+adjudicante(6, cmf, 928803358, fafe).
+adjudicante(7, cmg, 261109115, guimaraes).
+adjudicante(8, cmp, 974841598, porto).
+adjudicante(9, cmtb, 919338755, terras_bouro).
+adjudicante(10, cmvc, 369641730, vila_conde).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Extensão da negação forte do predicado adjudicante
@@ -222,8 +228,15 @@ adjudicante(1, cmb, 123456789, braga).
 %Extensão do predicado adjudicataria: #IdAda, Nome, Nif, Morada -> {V,F,D}
 
 adjudicataria(1, aaum, 420123954, braga).
-%(...)
-%FAZER EXATAMENTE 15 EXEMPLOS
+adjudicataria(2, bvvm, 420123954, vieira_minho).
+adjudicataria(3, hpb, 420123954, braga).
+adjudicataria(4, jeor, 420123954, povoa_varzim).
+adjudicataria(5, vsc, 420123954, guimaraes).
+adjudicataria(6, scb, 420123954, braga).
+adjudicataria(7, aevl, 420123954, vila_real).
+adjudicataria(8, pcne, 420123954, braga).
+adjudicataria(9, drpus, 420123954, braga).
+adjudicataria(10, mfc, 420123954, melgaco).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Extensão da negação forte do predicado adjudicataria
@@ -234,8 +247,15 @@ adjudicataria(1, aaum, 420123954, braga).
 %Extensão do predicado contrato: Id, IdA, IdAda, Tipo, Procedimento, Descricao, Valor, Prazo, Local, Data -> {V,F,D}
 
 contrato(1, 1, 1, aquisicao_servico, consulta_previa, assessoria, 13599, 547, braga, 11-02-2020).
-%(...)
-%FAZER EXATAMENTE 10 EXEMPLOS
+contrato(2, 5, 2, aquisicao_bens, ajuste_direto, assessoria, 1982, 53, viera_minho, 12-02-2020).
+contrato(3, 8, 6, locacao_bens, consulta_previa, assessoria, 13599, 547, povoa_varzim, 13-02-2020).
+contrato(4, 3, 4, aquisicao_servico, concurso_publico, assessoria, 13599, 547, vila_real, 14-02-2020).
+contrato(5, 9, 8, aquisicao_bens, consulta_previa, assessoria, 13599, 133, braga, 15-02-2020).
+contrato(6, 10,1, locacao_bens, concurso_publico, assessoria, 13599, 547, braga, 16-02-2020).
+contrato(7, 2, 2, aquisicao_bens, consulta_previa, assessoria, 13599, 547, lisboa, 17-02-2020).
+contrato(8, 6, 9, aquisicao_servico, concurso_publico, assessoria, 13599, 547, braga, 18-02-2020).
+contrato(9, 8, 3, aquisicao_bens, ajuste_direto, assessoria, 1359, 105, coimbra, 19-02-2020).
+contrato(10, 1, 1, locacao_bens, concurso_publico, assessoria, 13599, 547, braga, 20-02-2020).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Extensão da negação forte do predicado contrato
@@ -305,77 +325,109 @@ clausImperfeito(adjudicataria(ID,N,Nif,M), R) :-
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Conhecimento imperfeito interdito, para o predicado contrato
 
-% ---------------------------
-% -------  FAZER XD  --------    TUDO PUTAS CARALHO FODASSE PUTA QUE PARIU LÁ O CARALHO DESTA PUTA DESTA MERDA TODA FODASSE :)
-% ---------------------------
 
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% conhecimento imperfeito incerto, para o predicado contrato
 
+contrato(11,3,5,aquisicao_servico,consulta_previa,desc1,4932,360,braga,10-10-2010).
 
+excecao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)) :-
+    contrato(Id,IdA,IdAda,Tipo,Proc,desc1,Custo,Prazo,Local,Data).
 
+clausImperfeito(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)) :-
+    contrato(Id,IdA,IdAda,Tipo,Proc,desc1,Custo,Prazo,Local,Data),
+    R = (contrato(Id,IdA,IdAda,Tipo,Proc,desc1,Custo,Prazo,Local,Data)).
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+clausImperfeito(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data), R) :-
+    contrato(Id,IdA,IdAda,Tipo,Proc,desc1,Custo,Prazo,Local,Data),
+    R = (excecao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)) :-
+    contrato(Id,IdA,IdAda,Tipo,Proc,desc1,Custo,Prazo,Local,Data)).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Invariantes
-% Invariante Estrutural:  nao permitir a insercao de conhecimento
-%                         repetido para o adjudicante
 
-+adjudicante(IdA,Nome,Nif,Morada)::((solucoes(IdA, adjudicante(IdA,Nome,Nif,Morada), A), comprimento(A,N), N==1)).
+% Não permite que haja conhecimento negativo repetido
++(-Q) :: (solucoes(Q, clause(-Q, true), S),
+        comprimento(S,N), 
+        N =< 1).
 
-% Invariante Estrutural:  nao permitir a insercao de conhecimento
-%                         repetido para a adjudicataria
+% Não pode existir o mesmo conhecimento positivo e negativo em simultâneo
++Q :: nao(-Q).
 
-+adjudicataria(IdAda,Nome,Nif,Morada)::((solucoes(IdAda, adjudicataria(IdAda,Nome,Nif,Morada), A), comprimento(A,N), N==1)).
+% Não pode existir o mesmo conhecimento positivo e negativo em simultâneo
++(-Q) :: nao(Q).
 
-% Invariante Estrutural:  nao permitir a insercao de conhecimento
-%                         repetido para o contrato
-
-+cuidado(ID, D, IDu, IDp, Des, C) :: (solucoes((ID),(cuidado(ID,A,B,X,Y,Z)),S),
+% Não pode existir exatamente o mesmo conhecimento negativo e desconhecido
++(-Q) :: (solucoes(Q,clause(excecao(Q), true),S),
                   comprimento(S,N), 
+                  N == 0).
+
+% Não permitir a insercao de conhecimento repetido para o adjudicante
++adjudicante(IdA,Nome,Nif,Morada)::((solucoes(IdA, adjudicante(IdA,A,B,C), Z), comprimento(Z,N), N=<1)).
+
+% Não permitir a insercao de conhecimento repetido para a adjudicataria
++adjudicataria(IdAda,Nome,Nif,Morada)::((solucoes(IdAda, adjudicataria(IdAda,A,B,C), Z), comprimento(Z,N), N=<1)).
+
+% Não permitir a insercao de conhecimento repetido para o contrato
++contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data) :: (solucoes(Id,(contrato(Id,A,B,C,D,E,F,G,H,I)),Z),
+                  comprimento(Z,N), 
 				  N =< 1).
+
+% Não permite que remova o adjudicante caso este tenha contratos
+-adjudicante(IdA,Nome,Nif,Morada) :: (solucoes((IdA),(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)),S),
+                comprimento(S,N),
+                N == 0).
+
+% Não permite que remova a adjudicataria caso este tenha contratos
+-adjudicataria(IdAda,Nome,Nif,Morada) :: (solucoes((IdAda),(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)),S),
+                comprimento(S,N),
+                N == 0).     
+
+% Não permite inserir um contrato caso o adjudicante correspondente não esteja na base de conhecimento
++contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data) :: (solucoes(IdA,(adjudicante(IdA,Nome,Nif,Morada)),S),
+                  comprimento(S,N), 
+                  N == 1).
+
+% Não permite inserir um cuidado caso a adjudicataria correspondente não esteja na base de conhecimento
++contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data) :: (solucoes(IdAda,(adjudicataria(IdAda,Nome,Nif,Morada)),S),
+                  comprimento(S,N), 
+                  N == 1).          
+
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%---------------------------------
+%---------  TODO  ----------------
+%---------------------------------
+
+% Meter a só dar 3 tipos de porcedimento : ajuste_direto, consulta_previa, concurso_publico
+% Meter o ajuste direto com as seguintes cenas: 
+%     - Valor tem de ser menor que 5k
+%     - O tipo de contrato é : aquisicao_bens, locacao_bens, aquisicao_servicos
+%     - O prazo máximo é de 365 dias.
+% Um adjudicante não pode fazer um contrato com com o um adjucatario se:
+%     - Nos ultimos 3 anos a soma do valor dos contratos for >= 75k
