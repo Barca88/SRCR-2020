@@ -9,11 +9,7 @@
 
 :- set_prolog_flag( discontiguous_warnings,off ).
 :- set_prolog_flag( single_var_warnings,off ).
-%:- set_prolog_flag( unknown,fail ).
-
-:-style_check(-discontiguous).
-:- discontiguous (::)/2.
-:- discontiguous excecao/1.
+:- set_prolog_flag( unknown,fail ).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % SICStus PROLOG: definicoes iniciais
