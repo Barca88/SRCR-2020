@@ -30,6 +30,7 @@
 :- dynamic registaConhecimentoIncerto/2.
 :- dynamic nuloInterdito/1.
 :- dynamic (::)/2.
+:- dynamic soma/2.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Extensão do predicado insere: Termo -> {V,F}
@@ -264,6 +265,32 @@ contrato(10, 1, 1, locacao_bens, concurso_publico, assessoria, 13599, 547, braga
     nao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)), 
     nao(excecao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data))).
 
+%TODO CONFIRMAR SE É + OU -
+-contrato(Id,IdA,IdAda,Tipo,ajuste_direto,Desc,Custo,Prazo,Local,Data) :- 
+    Custo > 5000,
+    Prazo =< 365,
+    Tipo = aquisicao_bens.
+    
+-contrato(Id,IdA,IdAda,Tipo,ajuste_direto,Desc,Custo,Prazo,Local,Data) :- 
+    Custo > 5000,
+    Prazo =< 365,
+    Tipo = locacao_bens.
+
+-contrato(Id,IdA,IdAda,Tipo,ajuste_direto,Desc,Custo,Prazo,Local,Data) :- 
+    Custo > 5000,
+    Prazo =< 365,
+    Tipo = aquisicao_servico.
+
++contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data) :: (solucoes((IdA,IdAda),(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)), S)),
+    X = soma(S,0),
+    X =< 75000.
+    
+soma([], R) :- R.
+soma([contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)|T], R) :-
+    R = R + Custo,
+    soma(T, R).
+
+    
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Conhecimento imperfeito incerto, para o predicado adjudicante
 
@@ -400,26 +427,6 @@ clausImperfeito(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data), R)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 %---------------------------------
 %---------  TODO  ----------------
 %---------------------------------
@@ -429,5 +436,7 @@ clausImperfeito(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data), R)
 %     - Valor tem de ser menor que 5k
 %     - O tipo de contrato é : aquisicao_bens, locacao_bens, aquisicao_servicos
 %     - O prazo máximo é de 365 dias.
-% Um adjudicante não pode fazer um contrato com com o um adjucatario se:
+% Um adjudicante não pode fazer um contrato com o um adjucatario se:
 %     - Nos ultimos 3 anos a soma do valor dos contratos for >= 75k
+
+
