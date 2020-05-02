@@ -9,7 +9,11 @@
 
 :- set_prolog_flag( discontiguous_warnings,off ).
 :- set_prolog_flag( single_var_warnings,off ).
-:- set_prolog_flag( unknown,fail ).
+%:- set_prolog_flag( unknown,fail ).
+
+:-style_check(-discontiguous).
+:- discontiguous (::)/2.
+:- discontiguous excecao/1.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % SICStus PROLOG: definicoes iniciais
@@ -31,6 +35,7 @@
 :- dynamic nuloInterdito/1.
 :- dynamic (::)/2.
 :- dynamic soma/2.
+:- dynamic data/4.
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Extensão do predicado insere: Termo -> {V,F}
@@ -103,16 +108,25 @@ atualizar(adjudicataria(IdAda,N,Nif,M)):-
              R),
     elimina(R),
     insere(adjudicataria(IdAda,N,Nif,M)).
-
 % Conhecimento positivo -> Conhecimento positivo (contrato) 
-atualizar(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)):-
-    nao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)),
-    nao(excecao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)),
+atualizar(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)):-
+    nao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)),
+    nao(excecao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData))),
     solucoes((contrato(Id,_,_,_,_,_,_,_,_,_)),
              (contrato(Id,_,_,_,_,_,_,_,_,_)),
              R),
     elimina(R),
-    insere(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)).
+    insere(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)).
+
+% Conhecimento positivo -> Conhecimento positivo (data)
+atualizar(data(Id,A,M,D)):-
+    nao(data(Id,A,M,D)),
+    nao(excecao(data(Id,A,M,D))),
+    solucoes((data(Id,_,_,_)),
+             (data(Id,_,_,_)),
+             R),
+    elimina(R),
+    insere(data(Id,A,M,D)).
 
 % Conhecimento incerto/impreciso -> Conhecimento positivo
 atualizar(Q):-
@@ -245,51 +259,47 @@ adjudicataria(10, mfc, 420123954, melgaco).
 -adjudicataria(IdAda,N,Nif,M) :- nao(adjudicataria(IdAda,N,Nif,M)), nao(excecao(adjudicataria(IdAda,N,Nif,M))).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-%Extensão do predicado contrato: Id, IdA, IdAda, Tipo, Procedimento, Descricao, Valor, Prazo, Local, Data -> {V,F,D}
+%Extensão do predicado contrato: Id, IdA, IdAda, Tipo, Procedimento, Descricao, Valor, Prazo, Local, IdData -> {V,F,D}
 
-contrato(1, 1, 1, aquisicao_servico, consulta_previa, assessoria, 13599, 547, braga, 11-02-2020).
-contrato(2, 5, 2, aquisicao_bens, ajuste_direto, assessoria, 1982, 53, viera_minho, 12-02-2020).
-contrato(3, 8, 6, locacao_bens, consulta_previa, assessoria, 13599, 547, povoa_varzim, 13-02-2020).
-contrato(4, 3, 4, aquisicao_servico, concurso_publico, assessoria, 13599, 547, vila_real, 14-02-2020).
-contrato(5, 9, 8, aquisicao_bens, consulta_previa, assessoria, 13599, 133, braga, 15-02-2020).
-contrato(6, 10,1, locacao_bens, concurso_publico, assessoria, 13599, 547, braga, 16-02-2020).
-contrato(7, 2, 2, aquisicao_bens, consulta_previa, assessoria, 13599, 547, lisboa, 17-02-2020).
-contrato(8, 6, 9, aquisicao_servico, concurso_publico, assessoria, 13599, 547, braga, 18-02-2020).
-contrato(9, 8, 3, aquisicao_bens, ajuste_direto, assessoria, 1359, 105, coimbra, 19-02-2020).
-contrato(10, 1, 1, locacao_bens, concurso_publico, assessoria, 13599, 547, braga, 20-02-2020).
+contrato(1, 1, 1, aquisicao_servico, consulta_previa, assessoria, 13599, 547, braga, 1).
+contrato(2, 5, 2, aquisicao_bens, ajuste_direto, assessoria, 1982, 53, viera_minho, 2).
+contrato(3, 8, 6, locacao_bens, consulta_previa, assessoria, 13599, 547, povoa_varzim, 3).
+contrato(4, 3, 4, aquisicao_servico, concurso_publico, assessoria, 13599, 547, vila_real, 4).
+contrato(5, 9, 8, aquisicao_bens, consulta_previa, assessoria, 13599, 133, braga, 5).
+contrato(6, 10,1, locacao_bens, concurso_publico, assessoria, 13599, 547, braga, 6).
+contrato(7, 2, 2, aquisicao_bens, consulta_previa, assessoria, 13599, 547, lisboa, 7).
+contrato(8, 6, 9, aquisicao_servico, concurso_publico, assessoria, 13599, 547, braga, 8).
+contrato(9, 8, 3, aquisicao_bens, ajuste_direto, assessoria, 1359, 105, coimbra, 9).
+contrato(10, 1, 1, locacao_bens, concurso_publico, assessoria, 13599, 547, braga, 10).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Extensão da negação forte do predicado contrato
 
--contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data) :- 
-    nao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)), 
-    nao(excecao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data))).
+-contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData) :- 
+    nao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)), 
+    nao(excecao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData))).
 
-%TODO CONFIRMAR SE É + OU -
--contrato(Id,IdA,IdAda,Tipo,ajuste_direto,Desc,Custo,Prazo,Local,Data) :- 
-    Custo > 5000,
-    Prazo =< 365,
-    Tipo = aquisicao_bens.
-    
--contrato(Id,IdA,IdAda,Tipo,ajuste_direto,Desc,Custo,Prazo,Local,Data) :- 
-    Custo > 5000,
-    Prazo =< 365,
-    Tipo = locacao_bens.
+% -------------------------------------------------------------------------------------------
+%Extensão do predicado data: IdData, Ano, Mês, Dia -> {V,F}
+data(1,2020,1,1).
+data(2,2020,1,1).
+data(3,2020,1,1).
+data(4,2020,1,2).
+data(5,2020,1,2).
+data(6,2020,1,3).
+data(7,2020,1,3).
+data(8,2020,1,3).
+data(9,2020,1,4).
+data(10,2020,1,4).
+data(11,2020,1,5).
+data(12,2020,2,5).
+data(13,2020,2,6).
+data(14,2020,2,6).
+data(15,2020,2,7).
+data(16,2020,1,2).
+data(17,2020,3,5).
 
--contrato(Id,IdA,IdAda,Tipo,ajuste_direto,Desc,Custo,Prazo,Local,Data) :- 
-    Custo > 5000,
-    Prazo =< 365,
-    Tipo = aquisicao_servico.
-
-+contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data) :: (solucoes((IdA,IdAda),(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)), S)),
-    X = soma(S,0),
-    X =< 75000.
-    
-soma([], R) :- R.
-soma([contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)|T], R) :-
-    R = R + Custo,
-    soma(T, R).
-
+-data(IdD,Ano,Mes,Dia) :- nao(data(IdD,Ano,Mes,Dia)), nao(excecao(data(IdD,Ano,Mes,Dia))).
     
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Conhecimento imperfeito incerto, para o predicado adjudicante
@@ -356,19 +366,19 @@ clausImperfeito(adjudicataria(ID,N,Nif,M), R) :-
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % conhecimento imperfeito incerto, para o predicado contrato
 
-contrato(11,3,5,aquisicao_servico,consulta_previa,desc1,4932,360,braga,10-10-2010).
+contrato(11,3,5,aquisicao_servico,consulta_previa,desc1,4932,360,braga,10).
 
-excecao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)) :-
-    contrato(Id,IdA,IdAda,Tipo,Proc,desc1,Custo,Prazo,Local,Data).
+excecao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)) :-
+    contrato(Id,IdA,IdAda,Tipo,Proc,desc1,Custo,Prazo,Local,IdData).
 
-clausImperfeito(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)) :-
-    contrato(Id,IdA,IdAda,Tipo,Proc,desc1,Custo,Prazo,Local,Data),
-    R = (contrato(Id,IdA,IdAda,Tipo,Proc,desc1,Custo,Prazo,Local,Data)).
+clausImperfeito(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)) :-
+    contrato(Id,IdA,IdAda,Tipo,Proc,desc1,Custo,Prazo,Local,IdData),
+    R = (contrato(Id,IdA,IdAda,Tipo,Proc,desc1,Custo,Prazo,Local,IdData)).
 
-clausImperfeito(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data), R) :-
-    contrato(Id,IdA,IdAda,Tipo,Proc,desc1,Custo,Prazo,Local,Data),
-    R = (excecao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data)) :-
-    contrato(Id,IdA,IdAda,Tipo,Proc,desc1,Custo,Prazo,Local,Data)).
+clausImperfeito(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), R) :-
+    contrato(Id,IdA,IdAda,Tipo,Proc,desc1,Custo,Prazo,Local,IdData),
+    R = (excecao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)) :-
+    contrato(Id,IdA,IdAda,Tipo,Proc,desc1,Custo,Prazo,Local,IdData)).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % Invariantes
@@ -418,10 +428,31 @@ clausImperfeito(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data), R)
 % Não permite inserir um cuidado caso a adjudicataria correspondente não esteja na base de conhecimento
 +contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,Data) :: (solucoes(IdAda,(adjudicataria(IdAda,Nome,Nif,Morada)),S),
                   comprimento(S,N), 
-                  N == 1).          
+                  N == 1).    
+
+% Não permite inserção de conhecimento repetido para a data. 
++data(IdD,_,_,_) :: (solucoes(data(IdD,Ano,Mes,Dia), data(IdD,_,_,_), R), comprimento(R,N), N ==1).    
+
+% Garante que duas datas com Id diferentes não têm os mesmo dados
++data(_,Ano,Mes,Dia) :: (solucoes((Ano,Mes,Dia), data(_,Ano,Mes,Dia), R), comprimento(R,N), N==1).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 
++contrato(Id,IdA,IdAda,Tipo,ajuste_direto,Desc,Custo,Prazo,Local,IdData) :- 
+    Custo > 5000,
+    Prazo =< 365,
+    Tipo = aquisicao_bens; 
+    Tipo = locacao_bens;
+    Tipo = aquisicao_servico.
+    
++contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData) :: (solucoes((IdA,IdAda),(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)), S)),
+    X = soma(S,0),
+    X =< 75000.
+    
+soma([], R) :- R.
+soma([contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)|T], R) :-
+    R = R + Custo,
+    soma(T, R).
 
 
 
