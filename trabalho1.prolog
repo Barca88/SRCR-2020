@@ -277,6 +277,7 @@ contrato(10, 1, 1, locacao_bens, concurso_publico, assessoria, 13599, 547, braga
 
 % -------------------------------------------------------------------------------------------
 %Extensão do predicado data: IdData, Ano, Mês, Dia -> {V,F}
+
 data(1,2020,1,1).
 data(2,2020,1,1).
 data(3,2020,1,1).
@@ -356,10 +357,6 @@ clausImperfeito(adjudicataria(ID,N,Nif,M), R) :-
     R = (excecao(adjudicataria(Id,Nome,Numero,Morada)) :- adjudicataria(Id,Nome,Numero,sem_morada2)).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-% Conhecimento imperfeito interdito, para o predicado contrato
-
-
-%--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % conhecimento imperfeito incerto, para o predicado contrato
 
 contrato(11,3,5,aquisicao_servico,consulta_previa,desc1,4932,360,braga,10).
@@ -377,7 +374,7 @@ clausImperfeito(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), 
     contrato(Id,IdA,IdAda,Tipo,Proc,desc1,Custo,Prazo,Local,IdData)).
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
-% Invariantes
+% INVARIANTES
 
 % Não permite que haja conhecimento negativo repetido
 +(-Q) :: (solucoes(Q, clause(-Q, true), S),
@@ -432,38 +429,119 @@ clausImperfeito(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), 
 % Garante que duas datas com Id diferentes não têm os mesmo dados
 +data(_,Ano,Mes,Dia) :: (solucoes((Ano,Mes,Dia), data(_,Ano,Mes,Dia), R), comprimento(R,N), N==1).
 
-%--------------------------------- - - - - - - - - - -  -  -  -  -   -
 
+
+% vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv VERIFICAR vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+% Não permite adicionar contratos de ajuste direto se têm contratos com mais de 5000€ no ultimo ano.
 +contrato(Id,IdA,IdAda,Tipo,ajuste_direto,Desc,Custo,Prazo,Local,IdData) :- 
     Custo > 5000,
     Prazo =< 365,
     Tipo = aquisicao_bens; 
     Tipo = locacao_bens;
     Tipo = aquisicao_servico.
-    
+
+% Não permite adição de contratos entre duas entidades que nos ultimos 3 anos têm mais de 75mil€ em contratos
 +contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData) :: (solucoes((IdA,IdAda),(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)), S)),
     X = soma(S,0),
-    X =< 75000.
+    X =< 75000;
+    Prazo =< 1095
     
 soma([], R) :- R.
 soma([contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)|T], R) :-
     R = R + Custo,
     soma(T, R).
 
+% ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ VERIFICAR ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 
+%--------------------------------- - - - - - - - - - -  -  -  -  -   -
+% EXTRAS
 
-%---------------------------------
-%---------  TODO  ----------------
-%---------------------------------
+% Extensao do predicado registaAdjudicante: T -> {V,F}
+registaAdjudicante(IdA,N,Nif,M) :- evolucao(adjudicante(IdA,N,Nif,M)).
 
-% Meter a só dar 3 tipos de porcedimento : ajuste_direto, consulta_previa, concurso_publico
-% Meter o ajuste direto com as seguintes cenas: 
-%     - Valor tem de ser menor que 5k
-%     - O tipo de contrato é : aquisicao_bens, locacao_bens, aquisicao_servicos
-%     - O prazo máximo é de 365 dias.
-% Um adjudicante não pode fazer um contrato com o um adjucatario se:
-%     - Nos ultimos 3 anos a soma do valor dos contratos for >= 75k
+% Extensão do predicado registaAdjudicataria: T -> {V,F}
+registaAdjudicataria(IdAda,Nome,Nif,Morada) :- evolucao(adjudicataria(IdAda,Nome,Nif,Morada)).
 
+% Extensão do predicado registaContrato: T -> {V,F}
+registaContrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData) :- evolucao(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)).
+
+% Extensao do predicado removeAdjudicante : L -> {V,F}
+removeAdjudicante(ID) :- involucao(adjudicante(ID,_,_,_)).
+
+% Extensao do predicado removeAdjudicataria : L -> {V,F}
+removeAdjudicataria(ID) :- involucao(adjudicataria(ID,_,_,_)).
+
+% Extensao do predicado removeContrato: L -> {V,F}
+removeContrato(ID) :- involucao(contrato(ID,_,_,_,_,_,_,_,_,_)).
+
+% Identificar os adjudicante por critérios de seleção 
+adjudicanteID(IdA,R) :- solucoes(adjudicante(IdA,N,Nif,M), adjudicante(IdA,N,Nif,M), [R|_]).
+adjudicanteNome(N,R) :- solucoes((IdA,N,Nif,M), adjudicante(IdA,N,Nif,M), R).
+adjudicanteIdade(Nif,R) :- solucoes((IdA,N,Nif,M),adjudicante(IdA,N,Nif,M),R).
+adjudicanteMor(M,R) :- solucoes((IdA,N,Nif,M),adjudicante(IdA,N,Nif,M),R).
+
+% Identificar os adjudicataria por critérios de seleção 
+adjudicatariaID(IdAda,R) :- solucoes(adjudicataria(IdAda,N,Nif,M), adjudicataria(IdAda,N,Nif,M), [R|_]).
+adjudicatariaNome(N,R) :- solucoes((IdAda,N,Nif,M), adjudicataria(IdAda,N,Nif,M), R).
+adjudicatariaIdade(Nif,R) :- solucoes((IdAda,N,Nif,M),adjudicataria(IdAda,N,Nif,M),R).
+adjudicatariaMor(M,R) :- solucoes((IdAda,N,Nif,M),adjudicataria(IdAda,N,Nif,M),R).
+
+% Identificar contratos por critérios de seleção
+contrato_Id(Id,R) :- solucoes((Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData),R).
+contrato_IdA(IdA,R) :- solucoes((Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData),R).
+contrato_IdAda(IdAda,R) :- solucoes((Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData),R).
+contrato_Tipo(Tipo,R) :- solucoes((Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData),R).
+contrato_Proc(Proc,R) :- solucoes((Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData),R).
+contrato_Local(Local,R) :- solucoes((Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData),R).
+contrato_Data(IdData,R) :- solucoes((Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData),R).
+
+% Calcular o custo total dos contratos por adjudicante/adjudicataria/tipo/local/data
+custo_adjudicante(IdA,R) :- solucoes(Custo, contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), R1),
+					   custo_total(R1,R).
+
+custo_adjudicataria(IdAda,R) :- solucoes(Custo, contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), R1),
+					   custo_total(R1,R).
+
+custo_tipo(Tipo,R) :- solucoes(Custo, contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), R1),
+					   custo_total(R1,R).
+
+custo_local(Local,R) :- solucoes(Custo, contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), R1),
+					   custo_total(R1,R).
+
+custo_data(IdData,R) :- solucoes(Custo, contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), R1),
+					   custo_total(R1,R).
+
+% Extensão do predicado para o calculo do custo total de uma lista de custos
+% custo_total: Lista, Resultado -> {V,F}
+custo_total([X],X).
+custo_total([X,Y|Z], R) :- custo_total([X+Y|Z], R1), R is R1.
+
+% Predicado que devolve o número total de adjudicantes
+% total_adjudicante: Resultado -> {V,F}
+total_adjudicante(R) :- solucoes(IdA, adjudicante(IdA,N,Nif,M), L), comprimento(L,R).
+
+% predicado que devolve o número total de adjudicatarias
+% total_adjudicataria : R -> {V,F}
+total_adjudicataria(R) :- solucoes(IdAda, adjudicataria(IdAda,N,Nif,M), L), comprimento(L,R).
+
+% predicado que devolve o número total de contratos
+% total_contrato : R -> {V,F}
+total_contrato(R) :- solucoes(Id, contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), L), comprimento(L,R).
+
+%Extensão do predicado que verifica o contrato mais caro da base de conhecimento
+% contrato_mais_caro: Resultado -> {V,F}
+contrato_mais_caro(R) :- solucoes(Custo, contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), L), maxLista(L,R1), solucoes((Id,IdA,IdAda,Tipo,Proc,Desc,R1,Prazo,Local,IdData), contrato(Id,IdA,IdAda,Tipo,Proc,Desc,R1,Prazo,Local,IdData), R).
+
+%Extensão do predicado que calcula o máximo de uma lista
+% maxLista: Lista, Resultado -> {V,F}
+maxLista([H],R):- R is H.
+maxLista([X|L],R) :- maxLista(L,N), X>N, R is X.
+maxLista([X|L],R) :- maxLista(L,N), X=<N, R is N.
+
+%Extensão do predicado que da o numero de contratos com um certo tipo
+% nr_contrato_tipo: Tipo, ListaResultado -> {V,F}
+nr_contrato_tipo(Tipo,R) :- solucoes(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), R1), comprimento(R1,R).
 
