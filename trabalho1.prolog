@@ -491,12 +491,9 @@ nuloInterdito(sem_custo1).
 
 +data(_,Ano,Mes,Dia) :: (solucoes((Ano,Mes,Dia), data(_,Ano,Mes,Dia), R), comprimento(R,N), N==1).
 
-
-
-% vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv VERIFICAR vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-
 % Não permite adicionar contratos de ajuste direto se têm contratos com mais de 5000€ no ultimo ano.
-+contrato(Id,IdA,IdAda,Tipo,ajuste_direto,Desc,Custo,Prazo,Local,IdData) :- 
+
++contrato(Id,IdA,IdAda,Tipo,ajuste_direto,Desc,Custo,Prazo,Local,IdData) :: 
     Custo > 5000,
     Prazo =< 365,
     Tipo = aquisicao_bens; 
@@ -504,19 +501,16 @@ nuloInterdito(sem_custo1).
     Tipo = aquisicao_servico.
 
 % Não permite adição de contratos entre duas entidades que nos ultimos 3 anos têm mais de 75mil€ em contratos
+
 +contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData) :: (solucoes((IdA,IdAda),(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)), S)),
     X = soma(S,0),
     X =< 75000;
-    Prazo =< 1095
+    Prazo =< 1095.
     
 soma([], R) :- R.
 soma([contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)|T], R) :-
     R = R + Custo,
     soma(T, R).
-
-% ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ VERIFICAR ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
 
 %--------------------------------- - - - - - - - - - -  -  -  -  -   -
 % EXTRAS
