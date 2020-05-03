@@ -493,19 +493,26 @@ nuloInterdito(sem_custo1).
 
 % Não permite adicionar contratos de ajuste direto se têm contratos com mais de 5000€ no ultimo ano.
 
-+contrato(Id,IdA,IdAda,Tipo,ajuste_direto,Desc,Custo,Prazo,Local,IdData) :: 
-    Custo > 5000,
-    Prazo =< 365,
-    Tipo = aquisicao_bens; 
-    Tipo = locacao_bens;
-    Tipo = aquisicao_servico.
++contrato(Id,IdA,IdAda,Tipo,ajuste_direto,Desc,Custo,Prazo,Local,IdData) :: (solucoes((IdA,IdAda), contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), S),
+    somaDentroPrazo(S,365,X),
+    X =< 5000).
 
 % Não permite adição de contratos entre duas entidades que nos ultimos 3 anos têm mais de 75mil€ em contratos
 
-+contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData) :: (solucoes((IdA,IdAda),(contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)), S)),
-    X = soma(S,0),
-    X =< 75000;
-    Prazo =< 1095.
++contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData) :: (solucoes((IdA,IdAda), contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData), S),
+    somaDentroPrazo(S,1095,X),
+    X =< 75000).
+
+
+somaDentroPrazo([],P, 0).
+somaDentroPrazo([contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)|T], P, R) :-
+    somaDentroPrazo(T,P,G),
+    Prazo =< P,
+    R is G+Custo.
+somaDentroPrazo([contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)|T], P, R) :-
+    somaDentroPrazo(T,P,G),
+    Prazo > P,
+    R is G.
     
 soma([], R) :- R.
 soma([contrato(Id,IdA,IdAda,Tipo,Proc,Desc,Custo,Prazo,Local,IdData)|T], R) :-
